@@ -195,12 +195,12 @@ def main():
                     img_dir = os.path.join(opt['path']['val_images'], img_name)
                     util.mkdir(img_dir)
 
-                    model.feed_data(val_data)
+                    model.feed_data(val_data, need_GT=False)
                     model.test()
 
-                    visuals = model.get_current_visuals()
+                    visuals = model.get_current_visuals(need_GT=False)
                     sr_img = util.tensor2img(visuals['SR'])  # uint8
-                    gt_img = util.tensor2img(visuals['GT'])  # uint8
+                    # gt_img = util.tensor2img(visuals['GT'])  # uint8
 
                     # Save SR images for reference
                     save_img_path = os.path.join(img_dir,
@@ -208,35 +208,35 @@ def main():
                     util.save_img(sr_img, save_img_path)
 
                     # calculate PSNR
-                    crop_size = opt['scale']
-                    gt_img = gt_img / 255.
-                    sr_img = sr_img / 255.
-                    cropped_sr_img = sr_img[crop_size:-crop_size, crop_size:-crop_size, :]
-                    cropped_gt_img = gt_img[crop_size:-crop_size, crop_size:-crop_size, :]
-                    avg_psnr += util.calculate_psnr(cropped_sr_img * 255, cropped_gt_img * 255)
+                    # crop_size = opt['scale']
+                    # gt_img = gt_img / 255.
+                    # sr_img = sr_img / 255.
+                    # cropped_sr_img = sr_img[crop_size:-crop_size, crop_size:-crop_size, :]
+                    # cropped_gt_img = gt_img[crop_size:-crop_size, crop_size:-crop_size, :]
+                    # avg_psnr += util.calculate_psnr(cropped_sr_img * 255, cropped_gt_img * 255)
 
-                    # ----------------------------------------- ADDED -----------------------------------------
-                    val_pix_err_f += l1_loss(filter_low(visuals['SR']), filter_low(visuals['GT']))
-                    val_pix_err_nf += l1_loss(visuals['SR'], visuals['GT'])
-                    val_mean_color_err += mse_loss(visuals['SR'].mean(2).mean(1), visuals['GT'].mean(2).mean(1))
+                    # # ----------------------------------------- ADDED -----------------------------------------
+                    # val_pix_err_f += l1_loss(filter_low(visuals['SR']), filter_low(visuals['GT']))
+                    # val_pix_err_nf += l1_loss(visuals['SR'], visuals['GT'])
+                    # val_mean_color_err += mse_loss(visuals['SR'].mean(2).mean(1), visuals['GT'].mean(2).mean(1))
                     # -----------------------------------------------------------------------------------------
 
-                avg_psnr = avg_psnr / idx
-                val_pix_err_f /= idx
-                val_pix_err_nf /= idx
-                val_mean_color_err /= idx
+                # avg_psnr = avg_psnr / idx
+                # val_pix_err_f /= idx
+                # val_pix_err_nf /= idx
+                # val_mean_color_err /= idx
 
-                # log
-                logger.info('# Validation # PSNR: {:.4e}'.format(avg_psnr))
-                logger_val = logging.getLogger('val')  # validation logger
-                logger_val.info('<epoch:{:3d}, iter:{:8,d}> psnr: {:.4e}'.format(
-                    epoch, current_step, avg_psnr))
-                # tensorboard logger
-                if opt['use_tb_logger'] and 'debug' not in opt['name']:
-                    tb_logger.add_scalar('psnr', avg_psnr, current_step)
-                    tb_logger.add_scalar('val_pix_err_f', val_pix_err_f, current_step)
-                    tb_logger.add_scalar('val_pix_err_nf', val_pix_err_nf, current_step)
-                    tb_logger.add_scalar('val_mean_color_err', val_mean_color_err, current_step)
+                # # log
+                # logger.info('# Validation # PSNR: {:.4e}'.format(avg_psnr))
+                # logger_val = logging.getLogger('val')  # validation logger
+                # logger_val.info('<epoch:{:3d}, iter:{:8,d}> psnr: {:.4e}'.format(
+                #     epoch, current_step, avg_psnr))
+                # # tensorboard logger
+                # if opt['use_tb_logger'] and 'debug' not in opt['name']:
+                #     tb_logger.add_scalar('psnr', avg_psnr, current_step)
+                #     tb_logger.add_scalar('val_pix_err_f', val_pix_err_f, current_step)
+                #     tb_logger.add_scalar('val_pix_err_nf', val_pix_err_nf, current_step)
+                #     tb_logger.add_scalar('val_mean_color_err', val_mean_color_err, current_step)
 
             #### save models and training states
             if current_step % opt['logger']['save_checkpoint_freq'] == 0:

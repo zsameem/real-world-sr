@@ -1,31 +1,44 @@
 #### general settings
-name: DPED_SDSR
+name: DPED_IPHONE_NOISE_2
 use_tb_logger: true
 model: srgan
 distortion: sr
-scale: 4
-gpu_ids: [4]
+scale: 2
+gpu_ids: [0]
 
 #### datasets
 datasets:
   train:
-    name: DPED_train 
-    mode: LQGT    
-    dataroot_GT: ../../datasets/DPED/generated/clean/train_sdsr/HR
-    dataroot_LQ: ../../datasets/DPED/generated/clean/train_sdsr/LR
+    name: DF2K_train 
+    # mode: LQGT    
+    # dataroot_GT: ../../datasets/DPED/generated/clean/train_sdsr/HR
+    # dataroot_LQ: ../../datasets/DPED/generated/clean/train_sdsr/LR
 
     use_shuffle: true
-    n_workers: 6  # per GPU
-    batch_size: 16
-    GT_size: 128
+    # n_workers: 6  # per GPU
+    # batch_size: 16
+    # GT_size: 64
+    # use_flip: true
+    # use_rot: true
+    # color: RGB
+    mode: HR
+    dataroot_HR: /mnt/vol_b/sr/real-world-sr/datasets/DF2K/clean/train_HR/
+    # dataroot_LR: /home/samim/Desktop/ms/sr-datasets/prototyping-dataset/x2/train_LR
+    data_type: img
+    n_workers: 6
+    batch_size: 8
+    LR_size: 64
     use_flip: true
     use_rot: true
-    color: RGB
+    blur_kernel_path : /mnt/vol_b/sr/SRFBN_CVPR19/datasets/filters/klens_3/
+    noise_patch_path : /mnt/vol_b/sr/SRFBN_CVPR19/datasets/dped_noise_patches/iphone/
+    rgb_range: 255
+  
   val:
-    name: DPED_test
-    mode: LQGT
-    dataroot_GT: ../../datasets/DPED/test/iphone
-    dataroot_LQ: ../../datasets/DPED/generated/clean/valid_LR_clean
+    name: klens-norect
+    mode: LR
+    dataroot_GT: ~
+    dataroot_LR: /mnt/vol_b/sr/real-world-sr/datasets/klens-norect
     
 #### network structures
 network_G:
@@ -43,7 +56,7 @@ network_D:
 path:
   pretrain_model_G: ../experiments/pretrained_models/RRDB_ESRGAN_x4.pth
   strict_load: true
-  resume_state: ../experiments/DPED_SDSR_model/training_state/30000.state
+  # resume_state: ../experiments/DPED_SDSR_model/training_state/30000.state
 
 #### training settings: learning rate scheme, loss
 train:
@@ -64,7 +77,7 @@ train:
 
   use_filters: False
   pixel_criterion: l1
-  pixel_weight: !!float 1e-2
+  pixel_weight: !!float 1e1
   feature_criterion: l1
   feature_weight: 1
   gan_type: ragan  # gan | ragan
@@ -74,9 +87,9 @@ train:
   D_init_iters: 0
 
   manual_seed: 10
-  val_freq: !!float 5e3
+  val_freq: !!float 1e3
 
 #### logger
 logger:
   print_freq: 100
-  save_checkpoint_freq: !!float 5e3
+  save_checkpoint_freq: !!float 1e3
