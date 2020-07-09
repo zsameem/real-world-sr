@@ -1,0 +1,29 @@
+name: KLEIDO_SR
+suffix: ~  # add suffix to saved images
+model: sr
+distortion: sr
+scale: 2 
+divs: 5
+crop_border: ~  # crop border when evaluation. If None(~), crop the scale pixels
+gpu_ids: [0]
+data_type: img
+half_precision: true
+datasets:
+  test_1:  # the 1st test dataset
+    name: klens-norect
+    mode: LR
+    dataroot_GT: ~
+    dataroot_LR: /home/samim/Desktop/ms/real-world-sr/datasets/klens-norect-fullres
+  
+#### network structures
+network_G:
+  which_model_G: RRDBNet
+  in_nc: 3
+  out_nc: 3
+  nf: 64
+  nb: 23
+  upscale: 4
+
+#### path
+path:
+  pretrain_model_G: /home/samim/Desktop/ms/real-world-sr/esrgan-fs/experiments/POISSON_GAUSSIAN_NOISE_LEVEL_0-3/models/51000_G.pth

@@ -15,7 +15,8 @@ logger = logging.getLogger('base')
 class SRModel(BaseModel):
     def __init__(self, opt):
         super(SRModel, self).__init__(opt)
-
+        if opt['half_precision']:
+            self.half_precision = True
         if opt['dist']:
             self.rank = torch.distributed.get_rank()
         else:
@@ -83,6 +84,8 @@ class SRModel(BaseModel):
 
     def feed_data(self, data, need_GT=True):
         self.var_L = data['LQ'].to(self.device)  # LQ
+        if self.half_precision:
+            self.var_L = self.var_L.half()
         if need_GT:
             self.real_H = data['GT'].to(self.device)  # GT
 

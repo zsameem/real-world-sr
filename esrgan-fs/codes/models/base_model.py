@@ -95,6 +95,8 @@ class BaseModel():
             else:
                 load_net_clean[k] = v
         network.load_state_dict(load_net_clean, strict=strict)
+        if self.opt['half_precision']:
+            network.half()
 
     def save_training_state(self, epoch, iter_step):
         '''Saves training state during training, which will be used for resuming'''

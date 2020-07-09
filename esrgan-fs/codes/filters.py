@@ -45,6 +45,7 @@ class FilterLow(nn.Module):
         else:
             self.filter = nn.AvgPool2d(kernel_size=kernel_size, stride=stride, padding=pad, count_include_pad=include_pad)
         self.recursions = recursions
+        print("Low pass filter created gaussian = {}, kernel_size = {}".format(gaussian, kernel_size))
 
     def forward(self, img):
         for i in range(self.recursions):
